@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://week-4-mern-integration-assignment-g8yo.onrender.com/api',
 });
 
 // Posts
