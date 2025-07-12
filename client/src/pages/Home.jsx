@@ -8,7 +8,7 @@ const POSTS_PER_PAGE = 5;
 
 const STATIC_CATEGORIES = [
   'Electrician', 'Medical', 'Professor', 'Lawyer', 'Engineer',
-  'Mechanic', 'Nurse', 'Agent', 'Accountant', 'Developer',
+  'Mechanic', 'Nurse', 'Driver', 'Accountant', 'Developer',
   'Artist', 'Tailor', 'Farmer', 'Chef', 'Teacher',
 ];
 
@@ -23,23 +23,23 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const postRes = await getPosts();
-        const data = Array.isArray(postRes.data) ? postRes.data : [];
-        setPosts(data);
-        setFilteredPosts(data);
+        setPosts(postRes.data);
+        setFilteredPosts(postRes.data);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching data:', err.message);
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
   const handleCategoryClick = (categoryName) => {
     setSelectedCategory(categoryName);
     setCurrentPage(1);
-    const filtered = posts.filter((post) =>
-      Array.isArray(post.categories) && post.categories.includes(categoryName)
+    const filtered = posts.filter(post =>
+      post.categories?.includes(categoryName)
     );
     setFilteredPosts(filtered);
   };
@@ -67,10 +67,11 @@ const Home = () => {
     }
 
     try {
-      const res = await axios.post(
-        'https://week-4-mern-integration-assignment-uhy7.onrender.com/api/agents',
-        { name, email, subscriptionType }
-      );
+      const res = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/agents`, {
+        name,
+        email,
+        subscriptionType,
+      });
       alert(`✅ Subscription successful for ${res.data.name}`);
     } catch (err) {
       console.error('❌ Subscription error:', err.message);
@@ -81,7 +82,6 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 py-6 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        {/* Welcome Section */}
         <div className="bg-white p-6 rounded-xl shadow mb-8 flex flex-col gap-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-blue-800 text-center">
             🕋 Welcome to the Professionals Hub – A Platform for Muslim Unity & Expertise 🌍
@@ -100,7 +100,8 @@ const Home = () => {
               Whether you’re here to find trustworthy professionals, read insightful posts, or subscribe as an agent to showcase your skills, you are part of a global <strong>ummah</strong> committed to growth and success.
             </p>
             <div>
-              <p className="font-semibold text-blue-800 mb-1">🌟 Key Features:</p>
+              <p className="font-semibold text-blue-800 mb-1">🌟 Key Features:
+              </p>
               <ul className="list-disc list-inside ml-4 space-y-1">
                 <li>Browse through diverse categories of professionals</li>
                 <li>Read real stories, experiences, and posts shared by experts</li>
@@ -109,7 +110,7 @@ const Home = () => {
               </ul>
             </div>
             <p className="text-blue-600 font-semibold">
-              🕌 Let this be your digital Ihram – a place of intention, honesty, and dedication.
+              🌽 Let this be your digital Ihram – a place of intention, honesty, and dedication.
             </p>
             <p>
               Together, with one voice and one vision, we build a better world through trust, talent, and <strong>tawakkul</strong>.
@@ -117,18 +118,13 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Main Layout */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Posts Section */}
           <div className="flex-1 bg-white p-6 rounded-xl shadow">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold">
                 {selectedCategory ? `Posts in "${selectedCategory}"` : 'All Posts'}
               </h1>
-              <Link
-                to="/create"
-                className="text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
-              >
+              <Link to="/create" className="text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
                 + Create New Post
               </Link>
             </div>
@@ -147,7 +143,7 @@ const Home = () => {
             ) : (
               <>
                 <ul className="space-y-6">
-                  {Array.isArray(currentPosts) && currentPosts.length > 0 ? (
+                  {currentPosts.length > 0 ? (
                     currentPosts.map((post) => (
                       <li key={post._id} className="border-b pb-4">
                         <PostImage src={post.image} />
@@ -159,15 +155,14 @@ const Home = () => {
                         </Link>
                         <div className="text-sm text-gray-600 mt-1">
                           Categories:{' '}
-                          {Array.isArray(post.categories) &&
-                            post.categories.map((cat, idx) => (
-                              <span
-                                key={idx}
-                                className="mr-2 inline-block px-2 py-0.5 bg-gray-200 rounded text-xs"
-                              >
-                                {cat}
-                              </span>
-                            ))}
+                          {post.categories?.map((cat, idx) => (
+                            <span
+                              key={idx}
+                              className="mr-2 inline-block px-2 py-0.5 bg-gray-200 rounded text-xs"
+                            >
+                              {cat}
+                            </span>
+                          ))}
                         </div>
                       </li>
                     ))
@@ -197,9 +192,7 @@ const Home = () => {
             )}
           </div>
 
-          {/* Sidebar */}
           <aside className="w-full lg:w-1/3 bg-white p-6 rounded-xl shadow border border-gray-200 flex flex-col gap-8">
-            {/* Categories */}
             <div>
               <h3 className="text-xl font-semibold mb-3">Browse Categories</h3>
               <ul className="space-y-2">
@@ -220,7 +213,6 @@ const Home = () => {
               </ul>
             </div>
 
-            {/* Subscribe Plans */}
             <div>
               <h3 className="text-xl font-semibold mb-4">Subscribe as Agent</h3>
               <div className="flex flex-col gap-4">
@@ -246,7 +238,6 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Advertisement */}
             <div className="border-t pt-4">
               <h4 className="font-bold text-gray-800">ADVERTISEMENT</h4>
               <p className="mt-2 text-sm text-gray-600">

@@ -8,7 +8,7 @@ const AgentList = () => {
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const res = await axios.get('https://week-4-mern-integration-assignment-uhy7.onrender.com/api/agents');
+        const res = await axios.get('http://localhost:5000/api/agents');
         setAgents(res.data);
         setLoading(false);
       } catch (err) {

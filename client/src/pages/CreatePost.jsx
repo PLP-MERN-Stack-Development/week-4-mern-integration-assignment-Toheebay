@@ -28,7 +28,7 @@ const CreatePost = () => {
       formData.append('category', category.trim());
       if (image) formData.append('image', image);
 
-      const res = await axios.post('https://week-4-mern-integration-assignment-uhy7.onrender.com/api/posts', formData, {
+      const res = await axios.post('http://localhost:5000/api/posts', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

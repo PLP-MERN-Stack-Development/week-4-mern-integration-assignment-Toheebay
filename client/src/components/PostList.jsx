@@ -8,7 +8,7 @@ const PostList = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get('https://week-4-mern-integration-assignment-uhy7.onrender.com');
+        const res = await axios.get('http://localhost:5000/api/posts');
         setPosts(res.data);
       } catch (err) {
         setError('Failed to fetch posts');
@@ -32,7 +32,7 @@ const PostList = () => {
           <p><strong>Category:</strong> {post.category}</p>
           {post.image && (
             <img
-              src={`https://week-4-mern-integration-assignment-uhy7.onrender.com${post.image}`}
+              src={`http://localhost:5000${post.image}`}
               alt={post.title}
               style={{ width: '300px', objectFit: 'cover' }}
             />
