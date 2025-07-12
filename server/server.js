@@ -13,16 +13,20 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// ✅ Enhanced CORS Middleware with dynamic origin check
+if (!MONGO_URI) {
+  console.error('❌ MONGO_URI not set in .env file');
+  process.exit(1);
+}
+
+// ✅ CORS configuration
 const allowedOrigins = [
-  'http://localhost:3000',                 // Local development
-  'https://easyhajblog.netlify.app',       // ✅ Your actual frontend on Netlify
-  'https://pilgrimsblog.netlify.app',      // Optional: Add if used
+  'http://localhost:3000',                 // Local frontend
+  'https://easyhajblog.netlify.app',       // Netlify production frontend
+  'https://pilgrimsblog.netlify.app'       // Optional: Secondary frontend
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like Postman or curl)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -34,11 +38,11 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Middleware for JSON & Form data
+// Middleware for parsing JSON and form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static uploads (e.g., images)
+// Serve static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -50,15 +54,17 @@ app.get('/', (req, res) => {
   res.send('🚀 API is running');
 });
 
-// Connect to MongoDB and start server
+// MongoDB connection
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => {
+})
+.then(() => {
   console.log('✅ MongoDB connected');
   app.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
   });
-}).catch(err => {
+})
+.catch((err) => {
   console.error('❌ DB connection failed:', err.message);
 });
