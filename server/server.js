@@ -6,37 +6,40 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Load env vars
+// Load environment variables from .env
 dotenv.config();
-
-// Routes
-const postRoutes = require('./routes/posts');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// Middleware
-app.use(cors({
-  origin: ['http://localhost:3000'],
-  credentials: true
-}));
+// ✅ CORS Middleware to allow frontend from Netlify
+const corsOptions = {
+  origin: 'https://pilgrimsblog.netlify.app', // Netlify frontend URL
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
+// Middleware for JSON & Form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static uploads (images, etc.)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// API Routes
+// Routes
+const postRoutes = require('./routes/posts');
 app.use('/api/posts', postRoutes);
 
-// Test Route
+// Health check route
 app.get('/', (req, res) => {
   res.send('🚀 API is running');
 });
 
-// MongoDB Connect + Start Server
+// Connect to MongoDB and start server
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 }).then(() => {
   console.log('✅ MongoDB connected');
   app.listen(PORT, () => {
