@@ -13,6 +13,8 @@ dotenv.config();
 const postRoutes = require('./routes/posts');
 const categoryRoutes = require('./routes/categories');
 const authRoutes = require('./routes/auth');
+const agentRoutes = require('./routes/agents');
+const commentRoutes = require('./routes/comments'); // ✅ Comment Routes
 
 // Initialize app
 const app = express();
@@ -22,8 +24,22 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
 
 // ✅ CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://your-vercel-app.vercel.app',     // Replace with actual deployed frontend
+  'https://your-netlify-app.netlify.app',   // Replace with actual deployed frontend
+  'https://your-custom-domain.com'          // Optional: if you have a custom domain
+];
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('CORS not allowed from this origin: ' + origin), false);
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -47,6 +63,8 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/posts', postRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/agents', agentRoutes);
+app.use('/api/comments', commentRoutes); // ✅ Plug in comment routes
 
 // ✅ Root route
 app.get('/', (req, res) => {
@@ -78,7 +96,7 @@ mongoose.connect(MONGO_URI, {
     process.exit(1);
   });
 
-// ✅ Handle unhandled promise rejections
+// ✅ Handle unhandled promise rejections        
 process.on('unhandledRejection', (err) => {
   console.error('💥 Unhandled Rejection:', err.message);
   process.exit(1);

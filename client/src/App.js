@@ -1,23 +1,25 @@
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
+import About from './pages/About';
+import PostDetails from './pages/PostDetails';
 import CreatePost from './pages/CreatePost';
-import PostPage from './pages/PostPage';
-import EditPost from './pages/EditPost'; // ✅ Added this
-import Navbar from './components/Navbar';
+import AgentList from './pages/AgentList'; // ✅ New import
+import Navbar from './components/Navbar'; // optional, for navigation
 
-const App = () => {
+function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
         <Route path="/create" element={<CreatePost />} />
-        <Route path="/posts/:id" element={<PostPage />} />
-        <Route path="/edit/:id" element={<EditPost />} /> {/* ✅ Edit Route */}
-        <Route path="*" element={<div>Page Not Found</div>} />
+        <Route path="/posts/:id" element={<PostDetails />} />
+        <Route path="/agents" element={<AgentList />} /> {/* ✅ New route */}
       </Routes>
     </Router>
   );
-};
+}
 
 export default App;

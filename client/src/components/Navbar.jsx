@@ -10,6 +10,8 @@ const Navbar = () => {
         <div className="space-x-4">
           <Link to="/" className="hover:underline">Home</Link>
           <Link to="/create" className="hover:underline">Create</Link>
+          <Link to="/about" className="hover:underline">About</Link> {/* ✅ Added */}
+          <Link to="/agents" className="hover:underline">Agents</Link> {/* ✅ Added */}
         </div>
       </div>
     </nav>

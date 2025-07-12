@@ -1,23 +1,47 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getPost } from '../api';
+import axios from 'axios';
 
 const PostPage = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
   const [error, setError] = useState('');
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
 
+  // Fetch post and comments
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchData = async () => {
       try {
         const response = await getPost(id);
         setPost(response.data);
+
+        const commentsRes = await axios.get(`/api/comments/post/${id}`);
+        setComments(commentsRes.data);
       } catch (err) {
-        setError('Failed to load post.');
+        setError('Failed to load post or comments.');
       }
     };
-    fetchPost();
+    fetchData();
   }, [id]);
+
+  // Submit new comment
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim()) return;
+    try {
+      await axios.post('/api/comments', {
+        postId: id,
+        author: 'Anonymous', // Replace with logged-in user later
+        content: newComment
+      });
+      setNewComment('');
+      const updated = await axios.get(`/api/comments/post/${id}`);
+      setComments(updated.data);
+    } catch (err) {
+      console.error('Error posting comment:', err.message);
+    }
+  };
 
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
   if (!post) return <p>Loading...</p>;
@@ -30,7 +54,31 @@ const PostPage = () => {
 
       <div style={styles.actions}>
         <Link to={`/edit/${post._id}`} style={styles.editBtn}>Edit Post</Link>
-        {/* You can add a delete button here if needed */}
+      </div>
+
+      {/* Comments Section */}
+      <div style={styles.commentSection}>
+        <h2>Comments</h2>
+        {comments.length === 0 ? (
+          <p>No comments yet. Be the first!</p>
+        ) : (
+          comments.map((comment) => (
+            <div key={comment._id} style={styles.commentBox}>
+              <p style={styles.commentAuthor}><strong>{comment.author}</strong>:</p>
+              <p>{comment.content}</p>
+            </div>
+          ))
+        )}
+
+        {/* Add Comment */}
+        <textarea
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Write a comment..."
+          rows="3"
+          style={styles.textarea}
+        />
+        <button onClick={handleCommentSubmit} style={styles.commentBtn}>Post Comment</button>
       </div>
     </div>
   );
@@ -67,6 +115,37 @@ const styles = {
     color: '#fff',
     padding: '0.5rem 1rem',
     borderRadius: '4px',
+  },
+  commentSection: {
+    marginTop: '3rem',
+  },
+  commentBox: {
+    border: '1px solid #ccc',
+    padding: '1rem',
+    marginBottom: '1rem',
+    borderRadius: '6px',
+    backgroundColor: '#fafafa',
+  },
+  commentAuthor: {
+    marginBottom: '0.3rem',
+    fontWeight: 'bold',
+  },
+  textarea: {
+    width: '100%',
+    padding: '0.75rem',
+    marginTop: '1rem',
+    borderRadius: '6px',
+    border: '1px solid #ddd',
+    resize: 'vertical',
+  },
+  commentBtn: {
+    marginTop: '0.5rem',
+    backgroundColor: '#28a745',
+    color: '#fff',
+    padding: '0.5rem 1rem',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
   },
 };
 
