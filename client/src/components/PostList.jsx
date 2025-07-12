@@ -5,10 +5,13 @@ const PostList = () => {
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState('');
 
+  // ✅ Use deployed backend URL
+  const baseURL = 'https://pilgimsblog-1.onrender.com';
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/posts');
+        const res = await axios.get(`${baseURL}/api/posts`);
         setPosts(res.data);
       } catch (err) {
         setError('Failed to fetch posts');
@@ -32,7 +35,7 @@ const PostList = () => {
           <p><strong>Category:</strong> {post.category}</p>
           {post.image && (
             <img
-              src={`http://localhost:5000${post.image}`}
+              src={`${baseURL}${post.image}`}
               alt={post.title}
               style={{ width: '300px', objectFit: 'cover' }}
             />

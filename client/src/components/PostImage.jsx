@@ -1,6 +1,8 @@
 const PostImage = ({ src, alt }) => {
   const fallback = 'https://via.placeholder.com/600x600?text=No+Image';
-  const baseURL = 'http://localhost:5000'; // your backend URL
+
+  // Use deployed backend URL
+  const baseURL = 'https://pilgimsblog-1.onrender.com';
 
   const imageUrl = src ? `${baseURL}${src}` : fallback;
 

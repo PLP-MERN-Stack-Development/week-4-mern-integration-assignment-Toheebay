@@ -8,10 +8,13 @@ const SinglePost = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
+  // ✅ Use live base URL
+  const baseURL = 'https://pilgimsblog-1.onrender.com';
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/posts/${id}`);
+        const res = await axios.get(`${baseURL}/api/posts/${id}`);
         setPost(res.data);
         setError('');
       } catch (err) {
@@ -38,7 +41,7 @@ const SinglePost = () => {
 
       {post?.image && (
         <img
-          src={`http://localhost:5000${post.image}`}
+          src={`${baseURL}${post.image}`}
           alt="Post"
           className="w-full rounded shadow mb-4"
           onError={(e) => {
