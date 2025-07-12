@@ -15,8 +15,8 @@ const PostDetails = () => {
     const fetchPostAndComments = async () => {
       try {
         const [postRes, commentsRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/posts/${id}`),
-          axios.get(`http://localhost:5000/api/comments/post/${id}`)
+          axios.get(`https://week-4-mern-integration-assignment-uhy7.onrender.comapi/posts/${id}`),
+          axios.get(`https://week-4-mern-integration-assignment-uhy7.onrender.com/api/comments/post/${id}`)
         ]);
         setPost(postRes.data);
         setComments(commentsRes.data);
@@ -35,13 +35,13 @@ const PostDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/comments', {
+      await axios.post('https://week-4-mern-integration-assignment-uhy7.onrender.com/api/comments', {
         postId: id,
         author,
         content // ✅ send as "content" to match backend
       });
 
-      const res = await axios.get(`http://localhost:5000/api/comments/post/${id}`);
+      const res = await axios.get(`https://week-4-mern-integration-assignment-uhy7.onrender.com/api/comments/post/${id}`);
       setComments(res.data);
       setAuthor('');
       setContent('');
@@ -63,7 +63,7 @@ const PostDetails = () => {
 
       {post?.image && (
         <img
-          src={`http://localhost:5000${post.image}`}
+          src={`https://week-4-mern-integration-assignment-uhy7.onrender.com${post.image}`}
           alt="Post"
           className="w-full rounded mb-4"
           onError={(e) => {

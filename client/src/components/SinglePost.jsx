@@ -11,7 +11,7 @@ const SinglePost = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/posts/${id}`);
+        const res = await axios.get(`https://week-4-mern-integration-assignment-uhy7.onrender.com/api/posts/${id}`);
         setPost(res.data);
         setError('');
       } catch (err) {
@@ -38,7 +38,7 @@ const SinglePost = () => {
 
       {post?.image && (
         <img
-          src={`http://localhost:5000${post.image}`}
+          src={`https://week-4-mern-integration-assignment-uhy7.onrender.com${post.image}`}
           alt="Post"
           className="w-full rounded shadow mb-4"
           onError={(e) => {

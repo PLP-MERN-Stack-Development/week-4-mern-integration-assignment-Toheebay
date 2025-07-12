@@ -12,8 +12,8 @@ const ViewPost = () => {
   useEffect(() => {
     const fetchPostAndComments = async () => {
       try {
-        const postRes = await axios.get(`http://localhost:5000/api/posts/${id}`);
-        const commentsRes = await axios.get(`http://localhost:5000/api/comments/post/${id}`);
+        const postRes = await axios.get(`https://week-4-mern-integration-assignment-uhy7.onrender.com/api/posts/${id}`);
+        const commentsRes = await axios.get(`https://week-4-mern-integration-assignment-uhy7.onrender.com/api/comments/post/${id}`);
         setPost(postRes.data);
         setComments(commentsRes.data);
       } catch (err) {
@@ -29,7 +29,7 @@ const ViewPost = () => {
     if (!text || !author) return;
 
     try {
-      const res = await axios.post('http://localhost:5000/api/comments', {
+      const res = await axios.post('https://week-4-mern-integration-assignment-uhy7.onrender.com/api/comments', {
         postId: id,
         text,
         author,
@@ -50,7 +50,7 @@ const ViewPost = () => {
       <p className="text-gray-600 mb-2">By {post.author} — {new Date(post.createdAt).toLocaleDateString()}</p>
       {post.image && (
         <img
-          src={`http://localhost:5000${post.image}`}
+          src={`https://week-4-mern-integration-assignment-uhy7.onrender.com${post.image}`}
           alt="Post"
           className="w-full h-auto rounded-lg shadow mb-6"
         />

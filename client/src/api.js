@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api', // ✅ Changed to local server
+  baseURL: 'https://week-4-mern-integration-assignment-uhy7.onrender.com/api', // ✅ Changed to local server
 });
 
 // Posts

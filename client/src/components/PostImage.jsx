@@ -1,6 +1,6 @@
 const PostImage = ({ src, alt }) => {
   const fallback = 'https://via.placeholder.com/600x400?text=No+Image';
-  const baseURL = 'http://localhost:5000'; // 👈 your backend URL
+  const baseURL = 'https://week-4-mern-integration-assignment-uhy7.onrender.com'; // 👈 your backend URL
 
   return (
     <img

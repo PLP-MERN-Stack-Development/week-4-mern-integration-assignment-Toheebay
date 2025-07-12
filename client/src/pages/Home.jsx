@@ -67,7 +67,7 @@ const Home = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/agents', {
+      const res = await axios.post('https://week-4-mern-integration-assignment-uhy7.onrender.com/api/agents', {
         name,
         email,
         subscriptionType,
