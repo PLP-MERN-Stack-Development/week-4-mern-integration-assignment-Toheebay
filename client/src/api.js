@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // ✅ Axios instance using env variable with fallback
 const API = axios.create({
-  baseURL: `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api`,
+  baseURL: `${process.env.REACT_APP_API_URL || 'https://week-4-mern-integration-assignment-h8le.onrender.com/'}/api`,
   withCredentials: true, // Optional: if using cookies/auth
 });
 
