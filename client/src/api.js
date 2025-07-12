@@ -1,10 +1,17 @@
 // src/api/index.js
 import axios from 'axios';
 
-// ✅ Axios instance using env variable with fallback
+// ✅ Safely read VITE_API_URL with fallback
+const baseURL = import.meta.env?.VITE_API_URL || 'http://localhost:5000/api';
+
+if (!import.meta.env?.VITE_API_URL) {
+  console.warn("⚠️ VITE_API_URL is not defined. Falling back to http://localhost:5000/api");
+}
+
+// ✅ Create Axios instance
 const API = axios.create({
-  baseURL: `${process.env.REACT_APP_API_URL || 'https://week-4-mern-integration-assignment-h8le.onrender.com/'}/api`,
-  withCredentials: true, // Optional: if using cookies/auth
+  baseURL,
+  withCredentials: true, // Optional: Enable if using cookies or sessions
 });
 
 // ✅ Posts API
