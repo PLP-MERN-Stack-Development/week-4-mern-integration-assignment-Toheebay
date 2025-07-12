@@ -1,8 +1,9 @@
 // src/api/index.js
 import axios from 'axios';
 
+// ✅ Automatically use the deployed Render backend via env variable
 const API = axios.create({
-  baseURL: 'https://week-4-mern-integration-assignment-uhy7.onrender.com/api', // ✅ Changed to local server
+  baseURL: `${process.env.REACT_APP_API_URL}/api`,
 });
 
 // Posts
@@ -16,6 +17,6 @@ export const deletePost = (id) => API.delete(`/posts/${id}`);
 export const getCategories = () => API.get('/categories');
 export const createCategory = (data) => API.post('/categories', data);
 
-// Auth (optional)
+// Auth (if you use login/register)
 export const login = (credentials) => API.post('/auth/login', credentials);
 export const register = (credentials) => API.post('/auth/register', credentials);
