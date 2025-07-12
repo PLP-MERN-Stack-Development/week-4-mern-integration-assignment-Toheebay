@@ -1,10 +1,11 @@
 // src/api/index.js
 import axios from 'axios';
 
-const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Use import.meta.env for Vite
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-if (!process.env.REACT_APP_API_URL) {
-  console.warn("⚠️ REACT_APP_API_URL not set. Using fallback: http://localhost:5000/api");
+if (!import.meta.env.VITE_API_URL) {
+  console.warn("⚠️ VITE_API_URL not set. Using fallback: http://localhost:5000/api");
 }
 
 const API = axios.create({
