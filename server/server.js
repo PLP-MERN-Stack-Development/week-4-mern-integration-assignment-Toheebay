@@ -13,9 +13,21 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// ✅ CORS Middleware to allow frontend from Netlify
+// ✅ Enhanced CORS Middleware with dynamic origin check
+const allowedOrigins = [
+  'http://localhost:3000',                 // Local development
+  'https://pilgrimsblog.netlify.app',      // Deployed Netlify frontend
+  // Add more allowed domains if needed
+];
+
 const corsOptions = {
-  origin: 'https://pilgrimsblog.netlify.app', // Netlify frontend URL
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('❌ CORS Not Allowed for this origin: ' + origin));
+    }
+  },
   credentials: true,
 };
 app.use(cors(corsOptions));
