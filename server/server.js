@@ -16,34 +16,36 @@ const MONGO_URI = process.env.MONGO_URI;
 // ✅ Enhanced CORS Middleware with dynamic origin check
 const allowedOrigins = [
   'http://localhost:3000',                 // Local development
-  'https://pilgrimsblog.netlify.app',      // Deployed Netlify frontend
-  // Add more allowed domains if needed
+  'https://easyhajblog.netlify.app',       // ✅ Your actual frontend on Netlify
+  'https://pilgrimsblog.netlify.app',      // Optional: Add if used
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
+    // Allow requests with no origin (like Postman or curl)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('❌ CORS Not Allowed for this origin: ' + origin));
+      callback(new Error('❌ CORS Not Allowed: ' + origin));
     }
   },
   credentials: true,
 };
+
 app.use(cors(corsOptions));
 
 // Middleware for JSON & Form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static uploads (images, etc.)
+// Serve static uploads (e.g., images)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 const postRoutes = require('./routes/posts');
 app.use('/api/posts', postRoutes);
 
-// Health check route
+// Health check
 app.get('/', (req, res) => {
   res.send('🚀 API is running');
 });
