@@ -27,7 +27,7 @@ const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
 const allowedOrigins = [
   'http://localhost:3000',
   'https://your-vercel-app.vercel.app',     // Replace with actual deployed frontend
-  'https://your-netlify-app.netlify.app',   // Replace with actual deployed frontend
+  'https://hajj-agentblog.netlify.app',   // Replace with actual deployed frontend
   'https://your-custom-domain.com'          // Optional: if you have a custom domain
 ];
 
