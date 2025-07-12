@@ -9,14 +9,17 @@ const CreatePost = () => {
   const [image, setImage] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     setError('');
+    setLoading(true);
 
     if (!title.trim() || !content.trim()) {
       setError('Title and Content are required.');
+      setLoading(false);
       return;
     }
 
@@ -28,7 +31,7 @@ const CreatePost = () => {
       formData.append('category', category.trim());
       if (image) formData.append('image', image);
 
-      const res = await axios.post('http://localhost:5000/api/posts', formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/posts`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -46,6 +49,8 @@ const CreatePost = () => {
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || '❌ Failed to create post.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,8 +94,12 @@ const CreatePost = () => {
           onChange={(e) => setImage(e.target.files[0])}
           className="w-full"
         />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-          Create Post
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+          disabled={loading}
+        >
+          {loading ? 'Creating...' : 'Create Post'}
         </button>
         {message && <p className="text-green-600">{message}</p>}
         {error && <p className="text-red-600">{error}</p>}
