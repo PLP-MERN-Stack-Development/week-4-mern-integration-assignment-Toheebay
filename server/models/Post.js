@@ -1,26 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 
-const commentSchema = new mongoose.Schema(
-  {
-    author: {
-      type: String,
-      default: 'Anonymous',
-      trim: true,
-    },
-    content: {
-      type: String,
-      required: [true, 'Comment content is required'],
-      trim: true,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-  },
-  { _id: false }
-);
-
 const postSchema = new mongoose.Schema(
   {
     title: {
@@ -50,7 +30,15 @@ const postSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
-    comments: [commentSchema], // ✅ Add comments array
+
+    // ✅ Embedded comments
+    comments: [
+      {
+        author: { type: String, default: 'Anonymous' },
+        content: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );
