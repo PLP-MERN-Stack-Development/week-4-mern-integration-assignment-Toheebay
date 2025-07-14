@@ -3,36 +3,45 @@ const express = require('express');
 const router = express.Router();
 const Comment = require('../models/Comment');
 
-// POST /api/comments
-router.post('/', async (req, res) => {
-  const { postId, author, content } = req.body;
-
-  if (!postId || !author || !content) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
-
+// Get all comments for a post
+router.get('/:postId', async (req, res) => {
   try {
-    const comment = new Comment({ postId, author, content });
-    await comment.save();
-    res.status(201).json(comment);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    const comments = await Comment.find({ postId: req.params.postId }).sort({ createdAt: -1 });
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
-// GET /api/comments?postId=...
-router.get('/', async (req, res) => {
-  const { postId } = req.query;
-
-  if (!postId) {
-    return res.status(400).json({ message: 'postId is required' });
-  }
-
+// Create a comment
+router.post('/', async (req, res) => {
+  const { postId, author, content } = req.body;
   try {
-    const comments = await Comment.find({ postId });
-    res.status(200).json(comments);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    const comment = new Comment({ postId, author, content });
+    const saved = await comment.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Update a comment
+router.put('/:id', async (req, res) => {
+  try {
+    const updated = await Comment.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Delete a comment
+router.delete('/:id', async (req, res) => {
+  try {
+    await Comment.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Comment deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
