@@ -1,8 +1,8 @@
 // src/api/index.js
 import axios from 'axios';
 
-// ✅ Use process.env.REACT_APP_API_URL for Create React App
-const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Use .env variable
+const baseURL = process.env.REACT_APP_API_URL || 'https://pilgimsblog-1.onrender.com';
 
 if (!process.env.REACT_APP_API_URL) {
   console.warn("⚠️ REACT_APP_API_URL not set. Using fallback: http://localhost:5000/api");
@@ -10,7 +10,7 @@ if (!process.env.REACT_APP_API_URL) {
 
 const API = axios.create({
   baseURL,
-  withCredentials: true, // Optional: for cookie/session auth
+  withCredentials: true, // Optional: only needed if your API sets cookies
 });
 
 // Posts

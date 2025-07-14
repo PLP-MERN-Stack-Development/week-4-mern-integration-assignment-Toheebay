@@ -1,136 +1,64 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/EditPost.jsx
+
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getPost, updatePost } from '../api';
+import axios from 'axios';
 
 const EditPost = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  const [post, setPost] = useState({
-    title: '',
-    content: '',
-    category: '',
-  });
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [post, setPost] = useState({ title: '', content: '', category: '' });
 
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await getPost(id);
-        setPost(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to load post.');
-        setLoading(false);
-      }
-    };
-    fetchPost();
+    axios.get(`${import.meta.env.VITE_API_URL}/posts/${id}`).then((res) => {
+      setPost(res.data);
+    });
   }, [id]);
 
-  const handleChange = (e) => {
-    setPost({ ...post, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
+
     try {
-      await updatePost(id, post);
-      navigate(`/posts/${id}`);
+      await axios.put(`${import.meta.env.VITE_API_URL}/posts/${id}`, post);
+      navigate(`/posts/${id}`); // Redirect to detail page after update
     } catch (err) {
-      setError('Failed to update post.');
+      console.error('❌ Failed to update post:', err.message);
     }
   };
 
-  if (loading) return <p>Loading post...</p>;
-  if (error) return <p style={{ color: 'red' }}>{error}</p>;
-
   return (
-    <div style={styles.container}>
-      <h2>Edit Post</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <label style={styles.label}>
-          Title:
-          <input
-            type="text"
-            name="title"
-            value={post.title}
-            onChange={handleChange}
-            required
-            style={styles.input}
-          />
-        </label>
-
-        <label style={styles.label}>
-          Category:
-          <input
-            type="text"
-            name="category"
-            value={post.category}
-            onChange={handleChange}
-            required
-            style={styles.input}
-          />
-        </label>
-
-        <label style={styles.label}>
-          Content:
-          <textarea
-            name="content"
-            value={post.content}
-            onChange={handleChange}
-            required
-            rows={6}
-            style={styles.textarea}
-          />
-        </label>
-
-        <button type="submit" style={styles.button}>Update Post</button>
+    <div className="max-w-xl mx-auto mt-8 p-4">
+      <h2 className="text-2xl font-bold mb-4">Edit Post</h2>
+      <form onSubmit={handleUpdate}>
+        <input
+          type="text"
+          value={post.title}
+          onChange={(e) => setPost({ ...post, title: e.target.value })}
+          className="w-full p-2 border mb-2"
+          placeholder="Title"
+          required
+        />
+        <input
+          type="text"
+          value={post.category}
+          onChange={(e) => setPost({ ...post, category: e.target.value })}
+          className="w-full p-2 border mb-2"
+          placeholder="Category"
+          required
+        />
+        <textarea
+          value={post.content}
+          onChange={(e) => setPost({ ...post, content: e.target.value })}
+          className="w-full p-2 border mb-4 h-32"
+          placeholder="Content"
+          required
+        />
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Update Post
+        </button>
       </form>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '600px',
-    margin: '2rem auto',
-    padding: '1rem',
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    backgroundColor: '#f9f9f9',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  label: {
-    marginBottom: '1rem',
-    fontWeight: 'bold',
-  },
-  input: {
-    padding: '0.5rem',
-    fontSize: '1rem',
-    marginTop: '0.25rem',
-    width: '100%',
-  },
-  textarea: {
-    padding: '0.5rem',
-    fontSize: '1rem',
-    marginTop: '0.25rem',
-    width: '100%',
-    resize: 'vertical',
-  },
-  button: {
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    padding: '0.75rem',
-    fontSize: '1rem',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
 };
 
 export default EditPost;

@@ -1,47 +1,30 @@
-// routes/comments.js
 const express = require('express');
 const router = express.Router();
-const Comment = require('../models/Comment');
+const Post = require('../models/Post');
 
-// Get all comments for a post
-router.get('/:postId', async (req, res) => {
-  try {
-    const comments = await Comment.find({ postId: req.params.postId }).sort({ createdAt: -1 });
-    res.json(comments);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+// POST /api/comments/:postId - Add comment to a post
+router.post('/:postId', async (req, res) => {
+  const { postId } = req.params;
+  const { author, content } = req.body;
 
-// Create a comment
-router.post('/', async (req, res) => {
-  const { postId, author, content } = req.body;
   try {
-    const comment = new Comment({ postId, author, content });
-    const saved = await comment.save();
-    res.status(201).json(saved);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
 
-// Update a comment
-router.put('/:id', async (req, res) => {
-  try {
-    const updated = await Comment.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
+    const newComment = { author, content };
 
-// Delete a comment
-router.delete('/:id', async (req, res) => {
-  try {
-    await Comment.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Comment deleted' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    post.comments.push(newComment);
+    await post.save();
+
+    res.status(201).json({
+      message: 'Comment added successfully',
+      comments: post.comments,
+    });
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({ message: 'Server error', error });
   }
 });
 

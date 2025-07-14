@@ -1,6 +1,26 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 
+const commentSchema = new mongoose.Schema(
+  {
+    author: {
+      type: String,
+      default: 'Anonymous',
+      trim: true,
+    },
+    content: {
+      type: String,
+      required: [true, 'Comment content is required'],
+      trim: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false }
+);
+
 const postSchema = new mongoose.Schema(
   {
     title: {
@@ -23,13 +43,14 @@ const postSchema = new mongoose.Schema(
       sparse: true,
     },
     category: {
-      type: String, // 👈 one category per post
+      type: String,
       default: '',
     },
     image: {
-      type: String, // ✅ Add this field
-      default: '',   // Optional, fallback if no image uploaded
+      type: String,
+      default: '',
     },
+    comments: [commentSchema], // ✅ Add comments array
   },
   { timestamps: true }
 );
