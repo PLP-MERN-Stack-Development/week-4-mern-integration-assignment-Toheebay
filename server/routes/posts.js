@@ -1,7 +1,8 @@
+// routes/posts.js
 const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
-const upload = require('../middleware/upload'); // ✅ Multer middleware for image upload
+const upload = require('../middleware/upload'); // Multer middleware
 
 // GET /api/posts - fetch all posts
 router.get('/', async (req, res) => {
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/posts/:id - fetch single post by ID
+// GET /api/posts/:id - fetch a single post
 router.get('/:id', async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -24,9 +25,9 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ✅ POST /api/posts - create a new post with optional image
+// POST /api/posts - create a new post with optional image
 router.post('/', upload.single('image'), async (req, res) => {
-  const { title, content, author, category } = req.body; // renamed `categories` to `category` if you're using one
+  const { title, content, author, category } = req.body;
 
   try {
     const newPost = new Post({
@@ -53,6 +54,7 @@ router.put('/:id', async (req, res) => {
       { $set: req.body },
       { new: true }
     );
+    if (!updatedPost) return res.status(404).json({ message: 'Post not found' });
     res.status(200).json(updatedPost);
   } catch (err) {
     res.status(500).json({ message: 'Failed to update post' });
@@ -62,7 +64,8 @@ router.put('/:id', async (req, res) => {
 // DELETE /api/posts/:id - delete a post
 router.delete('/:id', async (req, res) => {
   try {
-    await Post.findByIdAndDelete(req.params.id);
+    const deletedPost = await Post.findByIdAndDelete(req.params.id);
+    if (!deletedPost) return res.status(404).json({ message: 'Post not found' });
     res.status(200).json({ message: 'Post deleted' });
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete post' });

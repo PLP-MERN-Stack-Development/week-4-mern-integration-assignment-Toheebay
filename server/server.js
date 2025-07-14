@@ -1,4 +1,4 @@
-// backend/server.js
+// server.js
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -6,7 +6,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Load environment variables from .env
+// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -18,43 +18,44 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-// ✅ CORS configuration
-const allowedOrigins = [
-  'http://localhost:3000',                 // Local frontend
-  'https://easyhajblog.netlify.app',       // Netlify production frontend
-  'https://pilgrimsblog.netlify.app'       // Optional: Secondary frontend
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('❌ CORS Not Allowed: ' + origin));
-    }
-  },
+// ✅ CORS Configuration
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://easyhajblog.netlify.app'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-};
+}));
 
-app.use(cors(corsOptions));
-
-// Middleware for parsing JSON and form data
+// ✅ Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
-const postRoutes = require('./routes/posts');
-app.use('/api/posts', postRoutes);
+// ✅ Optional: Set manual CORS headers for more control
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
-// Health check
+// ✅ Routes
+const postRoutes = require('./routes/posts');
+const commentRoutes = require('./routes/comments');
+
+app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
+
+// ✅ Test Route
 app.get('/', (req, res) => {
   res.send('🚀 API is running');
 });
 
-// MongoDB connection
+// ✅ MongoDB Connection
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

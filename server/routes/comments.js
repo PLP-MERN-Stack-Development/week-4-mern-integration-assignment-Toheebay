@@ -1,20 +1,9 @@
 // routes/comments.js
-
 const express = require('express');
-const Comment = require('../models/Comment');
 const router = express.Router();
+const Comment = require('../models/Comment');
 
-// Get all comments for a specific post
-router.get('/post/:postId', async (req, res) => {
-  try {
-    const comments = await Comment.find({ postId: req.params.postId }).sort({ createdAt: 1 });
-    res.json(comments);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Create a new comment
+// POST /api/comments
 router.post('/', async (req, res) => {
   const { postId, author, content } = req.body;
 
@@ -23,11 +12,27 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const newComment = new Comment({ postId, author, content });
-    await newComment.save();
-    res.status(201).json(newComment);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+    const comment = new Comment({ postId, author, content });
+    await comment.save();
+    res.status(201).json(comment);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// GET /api/comments?postId=...
+router.get('/', async (req, res) => {
+  const { postId } = req.query;
+
+  if (!postId) {
+    return res.status(400).json({ message: 'postId is required' });
+  }
+
+  try {
+    const comments = await Comment.find({ postId });
+    res.status(200).json(comments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
