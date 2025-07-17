@@ -1,19 +1,15 @@
+// components/Navbar.jsx
 import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   return (
-    <nav className="bg-blue-600 text-white px-6 py-4 shadow">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold">
-          MyBlog
-        </Link>
-        <div className="space-x-4">
-          <Link to="/" className="hover:underline">Home</Link>
-          <Link to="/create" className="hover:underline">Create</Link>
-          <Link to="/about" className="hover:underline">About</Link> {/* ✅ Added */}
-          <Link to="/agents" className="hover:underline">Agents</Link> {/* ✅ Added */}
-        </div>
-      </div>
+    <nav className="bg-blue-700 text-white px-6 py-3 flex justify-between items-center shadow">
+      <Link to="/" className="text-xl font-bold">
+        Professionals Hub
+      </Link>
+      <Link to="/create" className="bg-white text-blue-700 px-4 py-1 rounded hover:bg-gray-100">
+        + New Post
+      </Link>
     </nav>
   );
 };

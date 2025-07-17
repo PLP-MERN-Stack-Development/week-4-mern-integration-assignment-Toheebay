@@ -1,99 +1,104 @@
-import { useState } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
+import { createPost, getCategories } from '../api';
+import { useNavigate } from 'react-router-dom';
 
 const CreatePost = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [author, setAuthor] = useState('');
-  const [category, setCategory] = useState('');
-  const [image, setImage] = useState(null);
-  const [message, setMessage] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [image, setImage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // ✅ Use REACT_APP_API_URL for Create React App
-  const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  useEffect(() => {
+    getCategories()
+      .then((res) => {
+        console.log('📦 Categories:', res.data); // Debug log
+        setCategories(res.data);
+      })
+      .catch((err) => {
+        console.error('❌ Error fetching categories:', err.message);
+        alert('Failed to load categories');
+      });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('content', content);
-      formData.append('author', author);
-      formData.append('category', category);
-      if (image) formData.append('image', image);
-
-      const response = await axios.post(`${baseURL}/posts`, formData);
-      setMessage('Post created successfully!');
-      console.log(response.data);
-
-      // Clear form
-      setTitle('');
-      setContent('');
-      setAuthor('');
-      setCategory('');
-      setImage(null);
-    } catch (error) {
-      console.error('Error creating post:', error);
-      setMessage('Failed to create post');
+      const res = await createPost({
+        title,
+        content,
+        categories: selectedCategories,
+        image,
+      });
+      console.log('✅ Post created:', res.data);
+      navigate(`/posts/${res.data._id}`); // ✅ Navigate to PostDetail page
+    } catch (err) {
+      console.error('❌ Failed to create post:', err.response?.data || err.message);
+      alert('Failed to create post. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto p-4 shadow-md rounded bg-white">
+    <div className="max-w-3xl mx-auto bg-white p-6 rounded shadow mt-6">
       <h2 className="text-2xl font-bold mb-4">Create New Post</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          placeholder="Title"
+          className="w-full border p-2 rounded"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+        <textarea
+          placeholder="Content"
+          className="w-full border p-2 rounded h-40"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          required
+        ></textarea>
+        <input
+          type="text"
+          placeholder="Image URL"
+          className="w-full border p-2 rounded"
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
+        />
 
-      <input
-        type="text"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="block w-full mb-3 p-2 border border-gray-300 rounded"
-        required
-      />
+        <div className="flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <label key={cat._id} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                value={cat.name}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedCategories([...selectedCategories, e.target.value]);
+                  } else {
+                    setSelectedCategories(selectedCategories.filter((c) => c !== e.target.value));
+                  }
+                }}
+              />
+              {cat.name}
+            </label>
+          ))}
+        </div>
 
-      <textarea
-        placeholder="Content"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        className="block w-full mb-3 p-2 border border-gray-300 rounded"
-        required
-      />
-
-      <input
-        type="text"
-        placeholder="Author"
-        value={author}
-        onChange={(e) => setAuthor(e.target.value)}
-        className="block w-full mb-3 p-2 border border-gray-300 rounded"
-        required
-      />
-
-      <input
-        type="text"
-        placeholder="Category"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        className="block w-full mb-3 p-2 border border-gray-300 rounded"
-        required
-      />
-
-      <input
-        type="file"
-        onChange={(e) => setImage(e.target.files[0])}
-        className="block w-full mb-3"
-        accept="image/*"
-      />
-
-      <button
-        type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Submit
-      </button>
-
-      {message && <p className="mt-4 text-center text-sm text-green-600">{message}</p>}
-    </form>
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          {loading ? 'Posting...' : 'Submit'}
+        </button>
+      </form>
+    </div>
   );
 };
 

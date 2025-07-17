@@ -15,7 +15,7 @@ const PaymentPage = () => {
     }
 
     window.FlutterwaveCheckout({
-      public_key: "FLWPUBK_TEST-xxxxxxxxxxxxxxxxxxxxx-X", // replace with your test/live public key
+      public_key: "FLWPUBK-3d0e062fa50b5b538affc64535245178-X", // replace with your test/live public key
       tx_ref: "tx-" + Date.now(),
       amount: amount,
       currency: "NGN",

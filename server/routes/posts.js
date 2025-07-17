@@ -1,74 +1,88 @@
-// routes/posts.js
 const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
-const upload = require('../middleware/upload'); // Multer middleware
 
-// GET /api/posts - fetch all posts
+// GET all posts
 router.get('/', async (req, res) => {
   try {
     const posts = await Post.find().sort({ createdAt: -1 });
-    res.status(200).json(posts);
+    res.json(posts);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch posts' });
+    res.status(500).json({ message: 'Server error fetching posts' });
   }
 });
 
-// GET /api/posts/:id - fetch a single post
+// GET a single post by ID
 router.get('/:id', async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
-    res.status(200).json(post);
+    res.json(post);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch post' });
+    res.status(500).json({ message: err.message });
   }
 });
 
-// POST /api/posts - create a new post with optional image
-router.post('/', upload.single('image'), async (req, res) => {
-  const { title, content, author, category } = req.body;
-
+// CREATE a post
+router.post('/', async (req, res) => {
   try {
     const newPost = new Post({
-      title,
-      content,
-      author,
-      category,
-      image: req.file ? `/uploads/${req.file.filename}` : '',
+      title: req.body.title,
+      content: req.body.content,
+      categories: req.body.categories || [],
+      image: req.body.image || '',
+      author: req.body.author || 'Anonymous',
     });
 
-    await newPost.save();
-    res.status(201).json(newPost);
+    const savedPost = await newPost.save();
+    res.status(201).json(savedPost);
   } catch (err) {
-    console.error('❌ Error creating post:', err.message);
-    res.status(500).json({ message: 'Failed to create post' });
+    res.status(500).json({ message: 'Error creating post' });
   }
 });
 
-// PUT /api/posts/:id - update a post
+// UPDATE a post
 router.put('/:id', async (req, res) => {
   try {
-    const updatedPost = await Post.findByIdAndUpdate(
+    const updated = await Post.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      {
+        title: req.body.title,
+        content: req.body.content,
+        categories: req.body.categories || [],
+        image: req.body.image,
+      },
       { new: true }
     );
-    if (!updatedPost) return res.status(404).json({ message: 'Post not found' });
-    res.status(200).json(updatedPost);
+    if (!updated) return res.status(404).json({ message: 'Post not found' });
+    res.json(updated);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to update post' });
+    res.status(500).json({ message: 'Error updating post' });
   }
 });
 
-// DELETE /api/posts/:id - delete a post
+// DELETE a post
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedPost = await Post.findByIdAndDelete(req.params.id);
-    if (!deletedPost) return res.status(404).json({ message: 'Post not found' });
-    res.status(200).json({ message: 'Post deleted' });
+    const deleted = await Post.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Post not found' });
+    res.json({ message: 'Post deleted' });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to delete post' });
+    res.status(500).json({ message: 'Error deleting post' });
+  }
+});
+
+// LIKE a post
+router.post('/:id/like', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    post.likes = (post.likes || 0) + 1;
+    const updated = await post.save();
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: 'Error liking post' });
   }
 });
 
